@@ -1,0 +1,21 @@
+g :
+  ...
+  bx lr
+
+
+mov r1, #0
+ldr r2, =a
+add r2, r2, #1
+
+boucle :
+  cmp r1, r2
+  bz fin
+  bl g
+  add r1, r1, #1
+  
+  
+fin :
+
+.word a
+
+
