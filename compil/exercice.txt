@@ -1,3 +1,6 @@
+
+Exercice 1
+
 g :
   ...
   bx lr
@@ -19,3 +22,17 @@ fin :
 .word a
 
 
+
+
+Exercice 2
+
+
+
+ldr r1, =a
+ldr r2, =b
+ldr r3, =c
+
+
+.word a
+.word b
+.word c
