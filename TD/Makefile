@@ -12,7 +12,7 @@ LDFLAGS = -nostdlib -T ld_rams.lds
 LDLIBS = 
 
 EXE  = exec.elf
-OBJS = test.o init.o crt0.o
+OBJS = test.o init.o crt0.o memfunc.o
 
 
 .PHONY : connect clean all

@@ -7,3 +7,6 @@ _start:
     bl init_bss
     bl main
 
+_exit :
+    b _exit
+
