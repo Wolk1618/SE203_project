@@ -12,7 +12,8 @@ LDFLAGS = -nostdlib -T ld_rams.lds
 LDLIBS = 
 
 EXE  = exec.elf
-OBJS = test.o init.o crt0.o memfunc.o
+OBJS = main.o led.o init.o crt0.o memfunc.o
+DEPS = $(patsubst %.o , %.dep, $(OBJS))
 
 
 .PHONY : connect clean all
@@ -25,6 +26,8 @@ connect :
 $(EXE) : $(OBJS)
 	$(LD) $(LDFLAGS) $^ -o $@
 
+.%.dep : %.c
+	$(CC) -MM $< -MF $@
 
 clean :
 	rm -f $(OBJS)
