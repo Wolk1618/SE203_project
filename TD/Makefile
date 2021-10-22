@@ -3,7 +3,7 @@ CC = $(PREFIX)gcc
 AS = $(PREFIX)as
 LD = $(PREFIX)gcc
 
-CFLAGS = -g -O1 -ffreestanding
+CFLAGS = -g -O2 -ffreestanding -mfloat-abi=hard -mfpu=fpv4-sp-d16 -Wall -Wextra -Werror
 TARGET_ARCH = -mthumb -mcpu=cortex-m4
 ASFLAGS = -g
 TARGET_MACH = $(TARGET_ARCH)
@@ -12,7 +12,8 @@ LDFLAGS = -nostdlib -T ld_rams.lds
 LDLIBS = 
 
 EXE  = exec.elf
-OBJS = main.o led.o init.o crt0.o memfunc.o
+OBJS = main.o led.o init.o crt0.o memfunc.o clocks.o
+RM_OBJS = main.o led.o init.o crt0.o memfunc.o
 DEPS = $(patsubst %.o , %.dep, $(OBJS))
 
 
@@ -30,5 +31,5 @@ $(EXE) : $(OBJS)
 	$(CC) -MM $< -MF $@
 
 clean :
-	rm -f $(OBJS)
+	rm -f $(RM_OBJS)
 	rm -f $(EXE)

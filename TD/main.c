@@ -1,21 +1,25 @@
 #include "led.h"
+#include "clocks.h"
+
+#define ATTENTE 10000000
 
 int fibo(int n);
 
-int main(int argc, char * argv[]) {
+int main() {
+	clocks_init();
 	led_init();
 	while(1) {
 		led_g_on();
-		for (int i=0; i< 100000; i++)
+		for (int i=0; i< ATTENTE; i++)
 			asm volatile("nop");
 		led_g_off();
-		led(1);
-		for (int i=0; i< 100000; i++)
+		led(LED_YELLOW);
+		for (int i=0; i< ATTENTE; i++)
 			asm volatile("nop");
-		led(2);
-		for (int i=0; i< 100000; i++)
+		led(LED_BLUE);
+		for (int i=0; i< ATTENTE; i++)
 			asm volatile("nop");
-		led(0);
+		led(LED_OFF);
 	}
 }
 
