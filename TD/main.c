@@ -8,12 +8,25 @@
 
 int fibo(int n);
 
+uint32_t sum = 0;
+
 int main() {
 	clocks_init();
 	led_init();
 	uart_init();
-	while(1) {
-		/*led_g_on();
+	/*uart_putchar('i');
+	uart_putchar('n');
+	uart_putchar('i');
+	uart_putchar('t');
+	uart_putchar(' ');*/
+	uart_puts("init \n");
+	uart_puts("attente du programme\n");
+	for(int i=0; i < 200; i++) {
+		sum += uart_getchar();
+	}
+	uart_puts("somme finie\n");
+	/*while(1) {
+		led_g_on();
 		for (int i=0; i< ATTENTE; i++)
 			asm volatile("nop");
 		led_g_off();
@@ -24,9 +37,13 @@ int main() {
 		for (int i=0; i< ATTENTE; i++)
 			asm volatile("nop");
 		led(LED_OFF);*/
-		uint8_t *c = (uint8_t *) "r";
-		uart_putchar(*c);
-	}
+
+		/*char *s = "";
+		uart_gets(s, 5);
+		uart_putchar(' ');
+		uart_puts(s);
+	}*/
+	return 0;
 }
 
 int fibo(int n) {
