@@ -3,6 +3,7 @@
 #include "led.h"
 #include "clocks.h"
 #include "uart.h"
+#include "matrix.h"
 
 #define ATTENTE 10000000
 
@@ -19,12 +20,12 @@ int main() {
 	uart_putchar('i');
 	uart_putchar('t');
 	uart_putchar(' ');*/
-	uart_puts("init \n");
-	uart_puts("attente du programme\n");
+	uart_puts("init\n\r");
+	uart_puts("attente du programme\n\r");
 	for(int i=0; i < 200; i++) {
 		sum += uart_getchar();
 	}
-	uart_puts("somme finie\n");
+	uart_puts("somme finie\n\r");
 	/*while(1) {
 		led_g_on();
 		for (int i=0; i< ATTENTE; i++)
