@@ -3,7 +3,8 @@ CC = $(PREFIX)gcc
 AS = $(PREFIX)as
 LD = $(PREFIX)gcc
 
-CFLAGS = -g -O2 -ffreestanding -mfloat-abi=hard -mfpu=fpv4-sp-d16 -Wall -Wextra -Werror
+#CFLAGS = -g -O2 -ffreestanding -mfloat-abi=hard -mfpu=fpv4-sp-d16 -Wall -Wextra -Werror
+CFLAGS = -g -O2 -ffreestanding -mfloat-abi=hard -Wall -Wextra -Werror
 TARGET_ARCH = -mthumb -mcpu=cortex-m4
 ASFLAGS = -g
 TARGET_MACH = $(TARGET_ARCH)

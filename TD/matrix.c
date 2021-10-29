@@ -1,5 +1,11 @@
+#include <stddef.h>
+#include <stdint.h>
+
 #include "matrix.h"
 #include "./CMSIS/stm32l475xx.h"
+
+#define TMS 20000
+#define TNS 
 
 void matrix_init() {
 	RCC->AHB2ENR |= RCC_AHB2ENR_GPIOAEN;
@@ -16,39 +22,61 @@ void matrix_init() {
 	GPIOB->MODER = (GPIOB->MODER & ~GPIO_MODER_MODE2_Msk) | (1 << GPIO_MODER_MODE2_Pos);
 	GPIOC->MODER = (GPIOC->MODER & ~GPIO_MODER_MODE3_Msk) | (1 << GPIO_MODER_MODE3_Pos);
 	GPIOC->MODER = (GPIOC->MODER & ~GPIO_MODER_MODE4_Msk) | (1 << GPIO_MODER_MODE4_Pos);
-	GPIOC->MODER = (GPIOC->MODER & ~GPIO_MODER_MODE5_Msk) | (1 << GPIO_MODER_MODE5_Pos);
-	GPIOA->BSRR = 0;
-	GPIOB->BSRR = 0;
-	GPIOC->BSRR = 0;
-	GPIOC->BSRR |= GPIO_BSRR_BS4;
-	GPIOC->BSRR |= GPIO_BSRR_BS5;
-	for(int i=0; i<100000; i++) {
+	GPIOC->MODER = (GPIOC->MODER & ~GPIO_MODER_MODE5_Msk) | (1 << GPIO_MODER_MODE5_Pos); 
+	GPIOA->OSPEEDR |= GPIO_OSPEEDR_OSPEED2_Msk;
+	GPIOA->OSPEEDR |= GPIO_OSPEEDR_OSPEED3_Msk;
+	GPIOA->OSPEEDR |= GPIO_OSPEEDR_OSPEED5_Msk;
+	GPIOA->OSPEEDR |= GPIO_OSPEEDR_OSPEED6_Msk;
+	GPIOA->OSPEEDR |= GPIO_OSPEEDR_OSPEED7_Msk;
+	GPIOA->OSPEEDR |= GPIO_OSPEEDR_OSPEED15_Msk;
+	GPIOB->OSPEEDR |= GPIO_OSPEEDR_OSPEED0_Msk;
+	GPIOB->OSPEEDR |= GPIO_OSPEEDR_OSPEED1_Msk;
+	GPIOB->OSPEEDR |= GPIO_OSPEEDR_OSPEED2_Msk;
+	GPIOC->OSPEEDR |= GPIO_OSPEEDR_OSPEED3_Msk;
+	GPIOC->OSPEEDR |= GPIO_OSPEEDR_OSPEED4_Msk;
+	GPIOC->OSPEEDR |= GPIO_OSPEEDR_OSPEED5_Msk;
+	GPIOC->BSRR = GPIO_BSRR_BR3;
+	GPIOC->BSRR = GPIO_BSRR_BS4;
+	GPIOC->BSRR = GPIO_BSRR_BS5;
+	GPIOB->BSRR = GPIO_BSRR_BR1;
+	GPIOA->BSRR = GPIO_BSRR_BR4;
+	GPIOB->BSRR = GPIO_BSRR_BR2;
+	GPIOA->BSRR = GPIO_BSRR_BS15;
+	GPIOA->BSRR = GPIO_BSRR_BS2;
+	GPIOA->BSRR = GPIO_BSRR_BR7;
+	GPIOA->BSRR = GPIO_BSRR_BR6;
+	GPIOA->BSRR = GPIO_BSRR_BS5;
+	GPIOB->BSRR = GPIO_BSRR_BS0;
+	GPIOA->BSRR = GPIO_BSRR_BR3;
+	for(int i=0; i<100*TMS; i++) {
 		asm volatile("nop");
 	}
-	GPIOC->BSRR |= GPIO_BSRR_BS3;
+	GPIOC->BSRR = GPIO_BSRR_BS3;
+	init_bank0();
 }
 
 void pulse_SCK() {
+	SCK(0);
+	for(int i=0; i<1; i++) {
+		asm volatile("nop");
+	}
 	SCK(1);
-	for(int i=0; i<10000; i++) { //comment faire 25 ms ?
+	for(int i=0; i<1; i++) {
 		asm volatile("nop");
 	}
 	SCK(0);
-	for(int i=0; i<10000; i++) {
-		asm volatile("nop");
-	}
-
 }
 
 void pulse_LAT() {
+	LAT(1);
+	for(int i=0; i<1; i++) {
+		asm volatile("nop");
+	}
 	LAT(0);
-	for(int i=0; i<10000; i++) {
+	for(int i=0; i<1; i++) {
 		asm volatile("nop");
 	}
 	LAT(1);
-	for(int i=0; i<10000; i++) {
-		asm volatile("nop");
-	}
 }
 
 void deactivate_rows() {
@@ -63,14 +91,6 @@ void deactivate_rows() {
 }
 
 void activate_row(int row) {
-	ROW0(0);
-	ROW1(0);
-	ROW2(0);
-	ROW3(0);
-	ROW4(0);
-	ROW5(0);
-	ROW6(0);	
-	ROW7(0);
 	switch(row) {
 		case 0 :
 			ROW0(1);
@@ -99,106 +119,165 @@ void activate_row(int row) {
 	}
 }
 
+void send_byte(uint8_t val, int bank) {
+	if(bank == 1) {
+		SB(1);
+	} else {
+		SB(0);
+	}
+	for(int i = 7; i>=0; i--) {
+		SDA((val >> i) & 1);
+		pulse_SCK();
+	}
+}
+
+void mat_set_row(int row, const rgb_color *val) {
+	deactivate_rows();
+	for(int i=0; i<8; i++) {
+		send_byte(val[i].b,1);
+		send_byte(val[i].g,1);
+		send_byte(val[i].r,1);
+	}
+	activate_row(row);
+	pulse_LAT();
+}
+
+void init_bank0() {
+	uint8_t val1 = 255;
+	for(int i=0; i<18; i++) {
+		send_byte(val1, 0);
+	}
+	pulse_LAT();
+}
+
+void test_pixels() {
+	rgb_color color[8];
+	for(int i=0; i<8; i++) {
+		color[i].r = 0;
+		color[i].g = 0;
+		color[i].b = 255 - (i*32);
+	}
+	for(int i=0; i<8; i++) {
+		mat_set_row(i,color);
+	}
+	for(int i=0; i<8; i++) {
+		color[i].r = 0;
+		color[i].g = 255 - (i*32);
+		color[i].b = 0;
+	}
+	for(int i=0; i<8; i++) {
+		mat_set_row(i,color);
+	}
+	for(int i=0; i<8; i++) {
+		color[i].r = 255 - (i*32);
+		color[i].g = 0;
+		color[i].b = 0;
+	}
+	for(int i=0; i<8; i++) {
+		mat_set_row(i,color);
+	}
+}
+
 void RST(int x) {
 	if(x==0) {
-		GPIOC->BSRR |= GPIO_BSRR_BR3;
+		GPIOC->BSRR = GPIO_BSRR_BR3;
 	} else {
-		GPIOC->BSRR |= GPIO_BSRR_BS3;
+		GPIOC->BSRR = GPIO_BSRR_BS3;
 	}
 }
 
 void SB(int x) {
 	if(x==0) {
-		GPIOC->BSRR |= GPIO_BSRR_BR5;
+		GPIOC->BSRR = GPIO_BSRR_BR5;
 	} else {
-		GPIOC->BSRR |= GPIO_BSRR_BS5;
+		GPIOC->BSRR = GPIO_BSRR_BS5;
 	}
 }
 
 void LAT(int x) {
 	if(x==0) {
-		GPIOC->BSRR |= GPIO_BSRR_BR4;
+		GPIOC->BSRR = GPIO_BSRR_BR4;
 	} else {
-		GPIOC->BSRR |= GPIO_BSRR_BS4;
+		GPIOC->BSRR = GPIO_BSRR_BS4;
 	}
 }
 
 void SCK(int x) {
 	if(x==0) {
-		GPIOB->BSRR |= GPIO_BSRR_BR1;
+		GPIOB->BSRR = GPIO_BSRR_BR1;
 	} else {
-		GPIOB->BSRR |= GPIO_BSRR_BS1;
+		GPIOB->BSRR = GPIO_BSRR_BS1;
 	}
 }
 
 void SDA(int x) {
 	if(x==0) {
-		GPIOA->BSRR |= GPIO_BSRR_BR4;
+		GPIOA->BSRR = GPIO_BSRR_BR4;
 	} else {
-		GPIOA->BSRR |= GPIO_BSRR_BS4;
+		GPIOA->BSRR = GPIO_BSRR_BS4;
 	}
 }
 
 void ROW0(int x) {
 	if(x==0) {
-		GPIOB->BSRR |= GPIO_BSRR_BR2;
+		GPIOB->BSRR = GPIO_BSRR_BR2;
 	} else {
-		GPIOB->BSRR |= GPIO_BSRR_BS2;
+		GPIOB->BSRR = GPIO_BSRR_BS2;
 	}
 }
 
 void ROW1(int x) {
 	if(x==0) {
-		GPIOA->BSRR |= GPIO_BSRR_BR15;
+		GPIOA->BSRR = GPIO_BSRR_BR15;
 	} else {
-		GPIOA->BSRR |= GPIO_BSRR_BS15;
+		GPIOA->BSRR = GPIO_BSRR_BS15;
 	}
 }
 
 void ROW2(int x) {
 	if(x==0) {
-		GPIOA->BSRR |= GPIO_BSRR_BR2;
+		GPIOA->BSRR = GPIO_BSRR_BR2;
 	} else {
-		GPIOA->BSRR |= GPIO_BSRR_BS2;
+		GPIOA->BSRR = GPIO_BSRR_BS2;
 	}
 }
 
 void ROW3(int x) {
 	if(x==0) {
-		GPIOA->BSRR |= GPIO_BSRR_BR7;
+		GPIOA->BSRR = GPIO_BSRR_BR7;
 	} else {
-		GPIOA->BSRR |= GPIO_BSRR_BS7;
+		GPIOA->BSRR = GPIO_BSRR_BS7;
 	}
 }
 
 void ROW4(int x) {
 	if(x==0) {
-		GPIOA->BSRR |= GPIO_BSRR_BR6;
+		GPIOA->BSRR = GPIO_BSRR_BR6;
 	} else {
-		GPIOA->BSRR |= GPIO_BSRR_BS6;
+		GPIOA->BSRR = GPIO_BSRR_BS6;
 	}
 }
 
 void ROW5(int x) {
 	if(x==0) {
-		GPIOA->BSRR |= GPIO_BSRR_BS5;
+		GPIOA->BSRR = GPIO_BSRR_BS5;
 	} else {
-		GPIOA->BSRR |= GPIO_BSRR_BS5;
+		GPIOA->BSRR = GPIO_BSRR_BS5;
 	}
 }
 
 void ROW6(int x) {
 	if(x==0) {
-		GPIOB->BSRR |= GPIO_BSRR_BR0;
+		GPIOB->BSRR = GPIO_BSRR_BR0;
 	} else {
-		GPIOB->BSRR |= GPIO_BSRR_BS0;
+		GPIOB->BSRR = GPIO_BSRR_BS0;
 	}
 }
 
 void ROW7(int x) {
 	if(x==0) {
-		GPIOA->BSRR |= GPIO_BSRR_BR3;
+		GPIOA->BSRR = GPIO_BSRR_BR3;
 	} else {
-		GPIOA->BSRR |= GPIO_BSRR_BS3;
+		GPIOA->BSRR = GPIO_BSRR_BS3;
 	}
 }

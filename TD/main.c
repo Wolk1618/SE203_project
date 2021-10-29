@@ -13,19 +13,23 @@ uint32_t sum = 0;
 
 int main() {
 	clocks_init();
-	led_init();
-	uart_init();
+	/*led_init();
+	uart_init();*/
+	matrix_init();
+	while(1) {
+		test_pixels();
+	}
 	/*uart_putchar('i');
 	uart_putchar('n');
 	uart_putchar('i');
 	uart_putchar('t');
 	uart_putchar(' ');*/
-	uart_puts("init\n\r");
+	/*uart_puts("init\n\r");
 	uart_puts("attente du programme\n\r");
 	for(int i=0; i < 200; i++) {
 		sum += uart_getchar();
 	}
-	uart_puts("somme finie\n\r");
+	uart_puts("somme finie\n\r");*/
 	/*while(1) {
 		led_g_on();
 		for (int i=0; i< ATTENTE; i++)
