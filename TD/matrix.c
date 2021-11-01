@@ -5,14 +5,16 @@
 #include "./CMSIS/stm32l475xx.h"
 
 #define TMS 20000
-#define TNS 
+
 
 void matrix_init() {
 	RCC->AHB2ENR |= RCC_AHB2ENR_GPIOAEN;
 	RCC->AHB2ENR |= RCC_AHB2ENR_GPIOBEN;
 	RCC->AHB2ENR |= RCC_AHB2ENR_GPIOCEN;
+
 	GPIOA->MODER = (GPIOA->MODER & ~GPIO_MODER_MODE2_Msk) | (1 << GPIO_MODER_MODE2_Pos);
 	GPIOA->MODER = (GPIOA->MODER & ~GPIO_MODER_MODE3_Msk) | (1 << GPIO_MODER_MODE3_Pos);
+	GPIOA->MODER = (GPIOA->MODER & ~GPIO_MODER_MODE4_Msk) | (1 << GPIO_MODER_MODE4_Pos);
 	GPIOA->MODER = (GPIOA->MODER & ~GPIO_MODER_MODE5_Msk) | (1 << GPIO_MODER_MODE5_Pos);
 	GPIOA->MODER = (GPIOA->MODER & ~GPIO_MODER_MODE6_Msk) | (1 << GPIO_MODER_MODE6_Pos);
 	GPIOA->MODER = (GPIOA->MODER & ~GPIO_MODER_MODE7_Msk) | (1 << GPIO_MODER_MODE7_Pos);
@@ -22,35 +24,40 @@ void matrix_init() {
 	GPIOB->MODER = (GPIOB->MODER & ~GPIO_MODER_MODE2_Msk) | (1 << GPIO_MODER_MODE2_Pos);
 	GPIOC->MODER = (GPIOC->MODER & ~GPIO_MODER_MODE3_Msk) | (1 << GPIO_MODER_MODE3_Pos);
 	GPIOC->MODER = (GPIOC->MODER & ~GPIO_MODER_MODE4_Msk) | (1 << GPIO_MODER_MODE4_Pos);
-	GPIOC->MODER = (GPIOC->MODER & ~GPIO_MODER_MODE5_Msk) | (1 << GPIO_MODER_MODE5_Pos); 
-	GPIOA->OSPEEDR |= GPIO_OSPEEDR_OSPEED2_Msk;
-	GPIOA->OSPEEDR |= GPIO_OSPEEDR_OSPEED3_Msk;
-	GPIOA->OSPEEDR |= GPIO_OSPEEDR_OSPEED5_Msk;
-	GPIOA->OSPEEDR |= GPIO_OSPEEDR_OSPEED6_Msk;
-	GPIOA->OSPEEDR |= GPIO_OSPEEDR_OSPEED7_Msk;
-	GPIOA->OSPEEDR |= GPIO_OSPEEDR_OSPEED15_Msk;
-	GPIOB->OSPEEDR |= GPIO_OSPEEDR_OSPEED0_Msk;
-	GPIOB->OSPEEDR |= GPIO_OSPEEDR_OSPEED1_Msk;
-	GPIOB->OSPEEDR |= GPIO_OSPEEDR_OSPEED2_Msk;
-	GPIOC->OSPEEDR |= GPIO_OSPEEDR_OSPEED3_Msk;
-	GPIOC->OSPEEDR |= GPIO_OSPEEDR_OSPEED4_Msk;
-	GPIOC->OSPEEDR |= GPIO_OSPEEDR_OSPEED5_Msk;
+	GPIOC->MODER = (GPIOC->MODER & ~GPIO_MODER_MODE5_Msk) | (1 << GPIO_MODER_MODE5_Pos);
+
+	GPIOA->OSPEEDR |= GPIO_OSPEEDR_OSPEED2;
+	GPIOA->OSPEEDR |= GPIO_OSPEEDR_OSPEED3;
+	GPIOA->OSPEEDR |= GPIO_OSPEEDR_OSPEED4;
+	GPIOA->OSPEEDR |= GPIO_OSPEEDR_OSPEED5;
+	GPIOA->OSPEEDR |= GPIO_OSPEEDR_OSPEED6;
+	GPIOA->OSPEEDR |= GPIO_OSPEEDR_OSPEED7;
+	GPIOA->OSPEEDR |= GPIO_OSPEEDR_OSPEED15;
+	GPIOB->OSPEEDR |= GPIO_OSPEEDR_OSPEED0;
+	GPIOB->OSPEEDR |= GPIO_OSPEEDR_OSPEED1;
+	GPIOB->OSPEEDR |= GPIO_OSPEEDR_OSPEED2;
+	GPIOC->OSPEEDR |= GPIO_OSPEEDR_OSPEED3;
+	GPIOC->OSPEEDR |= GPIO_OSPEEDR_OSPEED4;
+	GPIOC->OSPEEDR |= GPIO_OSPEEDR_OSPEED5;
+
 	GPIOC->BSRR = GPIO_BSRR_BR3;
 	GPIOC->BSRR = GPIO_BSRR_BS4;
 	GPIOC->BSRR = GPIO_BSRR_BS5;
 	GPIOB->BSRR = GPIO_BSRR_BR1;
 	GPIOA->BSRR = GPIO_BSRR_BR4;
 	GPIOB->BSRR = GPIO_BSRR_BR2;
-	GPIOA->BSRR = GPIO_BSRR_BS15;
-	GPIOA->BSRR = GPIO_BSRR_BS2;
+	GPIOA->BSRR = GPIO_BSRR_BR15;
+	GPIOA->BSRR = GPIO_BSRR_BR2;
 	GPIOA->BSRR = GPIO_BSRR_BR7;
 	GPIOA->BSRR = GPIO_BSRR_BR6;
-	GPIOA->BSRR = GPIO_BSRR_BS5;
-	GPIOB->BSRR = GPIO_BSRR_BS0;
+	GPIOA->BSRR = GPIO_BSRR_BR5;
+	GPIOB->BSRR = GPIO_BSRR_BR0;
 	GPIOA->BSRR = GPIO_BSRR_BR3;
+
 	for(int i=0; i<100*TMS; i++) {
 		asm volatile("nop");
 	}
+
 	GPIOC->BSRR = GPIO_BSRR_BS3;
 	init_bank0();
 }
@@ -65,6 +72,9 @@ void pulse_SCK() {
 		asm volatile("nop");
 	}
 	SCK(0);
+	for(int i=0; i<1; i++) {
+		asm volatile("nop");
+	}
 }
 
 void pulse_LAT() {
@@ -77,6 +87,9 @@ void pulse_LAT() {
 		asm volatile("nop");
 	}
 	LAT(1);
+	for(int i=0; i<1; i++) {
+		asm volatile("nop");
+	}
 }
 
 void deactivate_rows() {
@@ -127,54 +140,66 @@ void send_byte(uint8_t val, int bank) {
 	}
 	for(int i = 7; i>=0; i--) {
 		SDA((val >> i) & 1);
+		asm volatile("nop");
 		pulse_SCK();
 	}
 }
 
 void mat_set_row(int row, const rgb_color *val) {
 	deactivate_rows();
-	for(int i=0; i<8; i++) {
-		send_byte(val[i].b,1);
-		send_byte(val[i].g,1);
-		send_byte(val[i].r,1);
+	for(int i=7; i>=0; i--) {
+		send_byte((val[i]).b,1);
+		send_byte((val[i]).g,1);
+		send_byte((val[i]).r,1);
 	}
 	activate_row(row);
 	pulse_LAT();
 }
 
 void init_bank0() {
-	uint8_t val1 = 255;
 	for(int i=0; i<18; i++) {
-		send_byte(val1, 0);
+		send_byte(0xFF, 0);
 	}
 	pulse_LAT();
 }
 
 void test_pixels() {
 	rgb_color color[8];
+	deactivate_rows();
 	for(int i=0; i<8; i++) {
-		color[i].r = 0;
-		color[i].g = 0;
-		color[i].b = 255 - (i*32);
-	}
-	for(int i=0; i<8; i++) {
-		mat_set_row(i,color);
-	}
-	for(int i=0; i<8; i++) {
-		color[i].r = 0;
-		color[i].g = 255 - (i*32);
-		color[i].b = 0;
-	}
-	for(int i=0; i<8; i++) {
-		mat_set_row(i,color);
-	}
-	for(int i=0; i<8; i++) {
-		color[i].r = 255 - (i*32);
+		color[i].r = 255-(32*i);
 		color[i].g = 0;
 		color[i].b = 0;
 	}
 	for(int i=0; i<8; i++) {
 		mat_set_row(i,color);
+		for(int i=0; i<100 * TMS; i++) {
+			asm volatile("nop");
+		}
+	}
+	deactivate_rows();
+	for(int i=0; i<8; i++) {
+		color[i].r = 0;
+		color[i].g = 255-(32*i);
+		color[i].b = 0;
+	}
+	for(int i=0; i<8; i++) {
+		mat_set_row(i,color);
+		for(int i=0; i<100 * TMS; i++) {
+			asm volatile("nop");
+		}
+	}
+	deactivate_rows();
+	for(int i=0; i<8; i++) {
+		color[i].r = 0;
+		color[i].g = 0;
+		color[i].b = 255-(32*i);
+	}
+	for(int i=0; i<8; i++) {
+		mat_set_row(i,color);
+		for(int i=0; i<100 * TMS; i++) {
+			asm volatile("nop");
+		}
 	}
 }
 
@@ -260,7 +285,7 @@ void ROW4(int x) {
 
 void ROW5(int x) {
 	if(x==0) {
-		GPIOA->BSRR = GPIO_BSRR_BS5;
+		GPIOA->BSRR = GPIO_BSRR_BR5;
 	} else {
 		GPIOA->BSRR = GPIO_BSRR_BS5;
 	}
