@@ -17,10 +17,8 @@ int main() {
 	uart_init();
 	matrix_init();
 	uart_puts("init finished\n\r");
-	while(1) {
-		uart_puts("test\n\r");
-		test_pixels();
-	}
+	uart_puts("test\n\r");
+	test_pixels();
 	/*uart_putchar('i');
 	uart_putchar('n');
 	uart_putchar('i');

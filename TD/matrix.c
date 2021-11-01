@@ -1,7 +1,11 @@
 #include <stddef.h>
 #include <stdint.h>
 
+#include <stdio.h>
+#include <stdlib.h>
+
 #include "matrix.h"
+#include "uart.h"
 #include "./CMSIS/stm32l475xx.h"
 
 #define TMS 20000
