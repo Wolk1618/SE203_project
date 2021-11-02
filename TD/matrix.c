@@ -150,12 +150,12 @@ void send_byte(uint8_t val, int bank) {
 }
 
 void mat_set_row(int row, const rgb_color *val) {
-	deactivate_rows();
 	for(int i=7; i>=0; i--) {
 		send_byte((val[i]).b,1);
 		send_byte((val[i]).g,1);
 		send_byte((val[i]).r,1);
 	}
+	deactivate_rows();
 	activate_row(row);
 	pulse_LAT();
 }
@@ -204,6 +204,28 @@ void test_pixels() {
 		for(int i=0; i<100 * TMS; i++) {
 			asm volatile("nop");
 		}
+	}
+}
+
+void print_image() { 
+	// note : on voit les lignes clignotter. Je pense que cela est du au fait que
+	// l'on fait appel à mat_set_row qui fait beaucoup d'appels de fonctions
+	extern uint8_t _binary_image_raw_start;
+	uint8_t * image = &_binary_image_raw_start;
+	while(1) {
+		for(int i=0; i<8; i++) {
+			rgb_color color[8];
+			for(int i=0; i<8; i++) {
+				color[i].r = *image;
+				image ++;
+				color[i].g = *image;
+				image ++;
+				color[i].b = *image;	
+				image ++;
+			}
+			mat_set_row(i, color);
+		}
+		image = &_binary_image_raw_start;
 	}
 }
 

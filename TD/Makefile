@@ -14,7 +14,7 @@ LDLIBS =
 
 EXE  = exec.elf
 OBJS = main.o led.o init.o crt0.o memfunc.o clocks.o uart.o matrix.o image.o
-RM_OBJS = main.o led.o init.o crt0.o memfunc.o
+RM_OBJS = main.o led.o init.o crt0.o memfunc.o uart.o matrix.o
 DEPS = $(patsubst %.o , %.dep, $(OBJS))
 
 

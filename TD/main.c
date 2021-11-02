@@ -19,6 +19,10 @@ int main() {
 	uart_puts("init finished\n\r");
 	uart_puts("test\n\r");
 	test_pixels();
+	uart_puts("debut");
+	print_image();
+
+	//uart_putchar(image[0]);
 	/*uart_putchar('i');
 	uart_putchar('n');
 	uart_putchar('i');
