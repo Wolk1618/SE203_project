@@ -1,3 +1,5 @@
+#ifndef LED_H
+#define LED_H
 
 typedef enum{
 	LED_OFF,
@@ -16,4 +18,4 @@ void led_b_on();
 void led_by_off();
 void led(state_led state);
 
-
+#endif

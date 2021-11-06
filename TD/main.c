@@ -4,6 +4,8 @@
 #include "clocks.h"
 #include "uart.h"
 #include "matrix.h"
+#include "irq.h"
+#include "button.h"
 
 #define ATTENTE 10000000
 
@@ -13,6 +15,8 @@ uint32_t sum = 0;
 
 int main() {
 	clocks_init();
+	irq_init();
+	button_init();
 	led_init();
 	uart_init();
 	matrix_init();
