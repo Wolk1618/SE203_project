@@ -18,12 +18,15 @@ RM_OBJS = main.o led.o init.o crt0.o memfunc.o uart.o matrix.o irq.o button.o
 DEPS = $(patsubst %.o , %.dep, $(OBJS))
 
 
-.PHONY : connect clean all
+.PHONY : connect clean all baudrate
 
 all : $(EXE)
 
 connect : 
 	JLinkGDBServer -device STM32L475VG -endian little -if SWD -speed auto -ir -LocalhostOnly
+
+baudrate :
+	sh ./stty.sh
 
 $(EXE) : $(OBJS)
 	$(LD) $(LDFLAGS) $^ -o $@

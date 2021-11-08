@@ -155,9 +155,15 @@ void mat_set_row(int row, const rgb_color *val) {
 		send_byte((val[i]).g,1);
 		send_byte((val[i]).r,1);
 	}
-	deactivate_rows();
-	activate_row(row);
 	pulse_LAT();
+	activate_row(row);
+	for(int i=0; i<(TMS/2); i++) {
+		asm volatile("nop");
+	}
+	deactivate_rows();
+	for(int i=0; i<(TMS/2); i++) {
+		asm volatile("nop");
+	}
 }
 
 void init_bank0() {
@@ -169,7 +175,6 @@ void init_bank0() {
 
 void test_pixels() {
 	rgb_color color[8];
-	deactivate_rows();
 	for(int i=0; i<8; i++) {
 		color[i].r = 255-(32*i);
 		color[i].g = 0;
@@ -177,11 +182,10 @@ void test_pixels() {
 	}
 	for(int i=0; i<8; i++) {
 		mat_set_row(i,color);
-		for(int i=0; i<100 * TMS; i++) {
+		for(int i=0; i<100*TMS; i++) {
 			asm volatile("nop");
 		}
 	}
-	deactivate_rows();
 	for(int i=0; i<8; i++) {
 		color[i].r = 0;
 		color[i].g = 255-(32*i);
@@ -189,11 +193,10 @@ void test_pixels() {
 	}
 	for(int i=0; i<8; i++) {
 		mat_set_row(i,color);
-		for(int i=0; i<100 * TMS; i++) {
+		for(int i=0; i<100*TMS; i++) {
 			asm volatile("nop");
 		}
 	}
-	deactivate_rows();
 	for(int i=0; i<8; i++) {
 		color[i].r = 0;
 		color[i].g = 0;
@@ -201,17 +204,16 @@ void test_pixels() {
 	}
 	for(int i=0; i<8; i++) {
 		mat_set_row(i,color);
-		for(int i=0; i<100 * TMS; i++) {
+		for(int i=0; i<100*TMS; i++) {
 			asm volatile("nop");
 		}
 	}
 }
 
-void print_image() { 
+void print_image(uint8_t * image_print) { 
 	// note : on voit les lignes clignotter. Je pense que cela est du au fait que
 	// l'on fait appel à mat_set_row qui fait beaucoup d'appels de fonctions
-	extern uint8_t _binary_image_raw_start;
-	uint8_t * image = &_binary_image_raw_start;
+	uint8_t * image = image_print;
 	while(1) {
 		for(int i=0; i<8; i++) {
 			rgb_color color[8];
@@ -225,7 +227,7 @@ void print_image() {
 			}
 			mat_set_row(i, color);
 		}
-		image = &_binary_image_raw_start;
+		image = image_print;
 	}
 }
 

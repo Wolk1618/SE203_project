@@ -10,28 +10,29 @@
 #define ATTENTE 10000000
 
 int fibo(int n);
+void init_trame();
 
+int compteur_trame = 0;
 uint32_t sum = 0;
+extern uint8_t _binary_image_raw_start;
+uint8_t * image = &_binary_image_raw_start;
+
+uint8_t trame[192];
 
 int main() {
 	clocks_init();
 	irq_init();
 	button_init();
 	led_init();
-	uart_init();
+	uart_init(38400);
 	matrix_init();
+	init_trame();
 	uart_puts("init finished\n\r");
 	uart_puts("test\n\r");
 	test_pixels();
-	uart_puts("debut");
-	print_image();
+	uart_puts("debut\n\r");
+	print_image(trame);
 
-	//uart_putchar(image[0]);
-	/*uart_putchar('i');
-	uart_putchar('n');
-	uart_putchar('i');
-	uart_putchar('t');
-	uart_putchar(' ');*/
 	/*uart_puts("init\n\r");
 	uart_puts("attente du programme\n\r");
 	for(int i=0; i < 200; i++) {
@@ -49,9 +50,9 @@ int main() {
 		led(LED_BLUE);
 		for (int i=0; i< ATTENTE; i++)
 			asm volatile("nop");
-		led(LED_OFF);*/
+		led(LED_OFF);
 
-		/*char *s = "";
+		char *s = "";
 		uart_gets(s, 5);
 		uart_putchar(' ');
 		uart_puts(s);
@@ -69,5 +70,8 @@ int fibo(int n) {
 	}
 }
 
-
-
+void init_trame() {
+	for(int i=0; i<192; i++) {
+		trame[i] = 200;
+	}
+}

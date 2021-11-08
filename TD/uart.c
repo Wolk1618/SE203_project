@@ -4,7 +4,10 @@
 #include "./CMSIS/stm32l475xx.h"
 #include "uart.h"
 
-void uart_init() {
+extern uint8_t trame[192];
+extern int compteur_trame;
+
+void uart_init(int baudrate) {
 
 	RCC->APB2ENR |= RCC_APB2ENR_USART1EN;
 	GPIOB->MODER = (GPIOB->MODER & ~GPIO_MODER_MODE6_Msk) | GPIO_MODER_MODE6_1;
@@ -17,8 +20,8 @@ void uart_init() {
 	USART1->CR1 = 0;
 	USART1->CR2 = 0;
 	//USART1->CR1 &= ~USART_CR1_UE;
-	USART1->BRR = 694;
-	//USART clock must tick every 694 tick of principal clock (80.000.000 / 115.200 = 694.444) and according to the doc, clock rate has 3% resilience so 694 is allowed
+	int rate = (int) (80000000/baudrate);
+	USART1->BRR = rate;
 	//USART1->CR1 &= ~USART_CR1_OVER8_Msk;
 	//USART1->CR1 &= ~USART_CR1_M_Msk;
 	//USART1->CR1 &= ~USART_CR1_PCE_Msk;
@@ -26,6 +29,8 @@ void uart_init() {
 	USART1->CR1 |= USART_CR1_UE;
 	USART1->CR1 |= USART_CR1_RE;
 	USART1->CR1 |= USART_CR1_TE;
+	USART1->CR1 |= USART_CR1_RXNEIE;
+	NVIC_EnableIRQ(USART1_IRQn);
 }
 
 void uart_putchar(uint8_t c) {
@@ -54,4 +59,14 @@ void uart_gets(char *s, size_t size) {
 		s[i] = uart_getchar();
 	}
 	s[(int)size] = '\0';
+}
+
+void USART1_IRQHandler() {
+	uint8_t byte = uart_getchar();
+	*(trame + compteur_trame) = byte;
+	if((compteur_trame == 191) | (byte == 0xFF)) {
+		compteur_trame = 0;
+	} else {
+		compteur_trame++;
+	}
 }
