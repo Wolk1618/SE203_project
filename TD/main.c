@@ -6,18 +6,16 @@
 #include "matrix.h"
 #include "irq.h"
 #include "button.h"
+#include "timer.h"
 
 #define ATTENTE 10000000
 
 int fibo(int n);
-void init_trame();
 
 int compteur_trame = 0;
 uint32_t sum = 0;
 extern uint8_t _binary_image_raw_start;
 uint8_t * image = &_binary_image_raw_start;
-
-uint8_t trame[192];
 
 int main() {
 	clocks_init();
@@ -26,12 +24,15 @@ int main() {
 	led_init();
 	uart_init(38400);
 	matrix_init();
-	init_trame();
-	uart_puts("init finished\n\r");
-	uart_puts("test\n\r");
+	trame_init();
+	//uart_puts("init finished\n\r");
+	//uart_puts("test\n\r");
 	test_pixels();
-	uart_puts("debut\n\r");
-	print_image(trame);
+	//uart_puts("debut\n\r");
+	timer_init(1000000/(60*8));
+	while(1) {
+		print_image(trame);
+	}
 
 	/*uart_puts("init\n\r");
 	uart_puts("attente du programme\n\r");
@@ -67,11 +68,5 @@ int fibo(int n) {
 		return 1;
 	} else {
 		return fibo(n-1) + fibo(n-2);
-	}
-}
-
-void init_trame() {
-	for(int i=0; i<192; i++) {
-		trame[i] = 200;
 	}
 }

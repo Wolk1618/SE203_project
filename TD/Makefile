@@ -13,8 +13,8 @@ LDFLAGS = -nostdlib -T ld_rams.lds
 LDLIBS = 
 
 EXE  = exec.elf
-OBJS = main.o led.o init.o crt0.o memfunc.o clocks.o uart.o matrix.o image.o irq.o button.o
-RM_OBJS = main.o led.o init.o crt0.o memfunc.o uart.o matrix.o irq.o button.o
+OBJS = main.o led.o init.o crt0.o memfunc.o clocks.o uart.o matrix.o image.o irq.o button.o timer.o
+RM_OBJS = main.o led.o init.o crt0.o memfunc.o uart.o matrix.o irq.o button.o timer.o
 DEPS = $(patsubst %.o , %.dep, $(OBJS))
 
 

@@ -2,6 +2,8 @@
 
 #include "./CMSIS/stm32l475xx.h"
 
+int on_button = 0;
+
 void button_init(void) {
 	RCC->AHB2ENR |= RCC_AHB2ENR_GPIOCEN;
 	GPIOC->MODER = (GPIOC->MODER & ~GPIO_MODER_MODE13_Msk);
@@ -16,9 +18,11 @@ void button_init(void) {
 
 void EXTI15_10_IRQHandler() {
 	EXTI->PR1 |= EXTI_PR1_PIF13;
-	GPIOB->BSRR = GPIO_BSRR_BS14;
-	for(int i=0; i<100*TMS; i++) {
-		asm volatile("nop");
+	if(on_button) {
+		GPIOB->BSRR = GPIO_BSRR_BR14;
+		on_button = 0;
+	} else {
+		GPIOB->BSRR = GPIO_BSRR_BS14;
+		on_button = 1;
 	}
-	GPIOB->BSRR = GPIO_BSRR_BR14;
 }

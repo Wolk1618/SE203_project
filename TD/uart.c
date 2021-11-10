@@ -3,8 +3,8 @@
 
 #include "./CMSIS/stm32l475xx.h"
 #include "uart.h"
+#include "timer.h"
 
-extern uint8_t trame[192];
 extern int compteur_trame;
 
 void uart_init(int baudrate) {
@@ -26,10 +26,11 @@ void uart_init(int baudrate) {
 	//USART1->CR1 &= ~USART_CR1_M_Msk;
 	//USART1->CR1 &= ~USART_CR1_PCE_Msk;
 	//USART1->CR2 &= ~USART_CR2_STOP_Msk;
-	USART1->CR1 |= USART_CR1_UE;
 	USART1->CR1 |= USART_CR1_RE;
 	USART1->CR1 |= USART_CR1_TE;
 	USART1->CR1 |= USART_CR1_RXNEIE;
+	USART1->ISR = 0;
+	USART1->CR1 |= USART_CR1_UE;
 	NVIC_EnableIRQ(USART1_IRQn);
 }
 
@@ -43,7 +44,6 @@ uint8_t uart_getchar() {
 	while((USART1->ISR & USART_ISR_RXNE_Msk) == 0) {
 	}
 	return USART1->RDR;
-
 }
 
 void uart_puts(const char *s) {
@@ -62,7 +62,12 @@ void uart_gets(char *s, size_t size) {
 }
 
 void USART1_IRQHandler() {
-	uint8_t byte = uart_getchar();
+	uint8_t byte = 0;
+	//uint8_t byte = uart_getchar();
+	if((USART1->ISR & USART_ISR_RXNE_Msk) != 0) {
+		byte = USART1->RDR;
+	}
+	//uart_putchar(byte);
 	*(trame + compteur_trame) = byte;
 	if((compteur_trame == 191) | (byte == 0xFF)) {
 		compteur_trame = 0;

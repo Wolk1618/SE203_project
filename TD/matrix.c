@@ -10,6 +10,7 @@
 
 #define TMS 20000
 
+int attente = 1;
 
 void matrix_init() {
 	RCC->AHB2ENR |= RCC_AHB2ENR_GPIOAEN;
@@ -214,20 +215,20 @@ void print_image(uint8_t * image_print) {
 	// note : on voit les lignes clignotter. Je pense que cela est du au fait que
 	// l'on fait appel à mat_set_row qui fait beaucoup d'appels de fonctions
 	uint8_t * image = image_print;
-	while(1) {
+	for(int i=0; i<8; i++) {
+		rgb_color color[8];
 		for(int i=0; i<8; i++) {
-			rgb_color color[8];
-			for(int i=0; i<8; i++) {
-				color[i].r = *image;
-				image ++;
-				color[i].g = *image;
-				image ++;
-				color[i].b = *image;	
-				image ++;
-			}
-			mat_set_row(i, color);
+			color[i].r = *image;
+			image ++;
+			color[i].g = *image;
+			image ++;
+			color[i].b = *image;	
+			image ++;
 		}
-		image = image_print;
+		if(attente == 0) {
+			mat_set_row(i, color);
+			attente = 1;
+		}
 	}
 }
 
