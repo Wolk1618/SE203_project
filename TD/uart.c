@@ -1,11 +1,6 @@
-#include <stdint.h>
-#include <stddef.h>
-
-#include "./CMSIS/stm32l475xx.h"
 #include "uart.h"
-#include "timer.h"
 
-extern int compteur_trame;
+int compteur_trame = 0;
 
 void uart_init(int baudrate) {
 

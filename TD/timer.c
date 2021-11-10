@@ -1,11 +1,8 @@
 #include "timer.h"
 
-#include "./CMSIS/stm32l475xx.h"
-
 int on = 0;
 uint8_t trame[192];
 int compteur_ligne = 0;
-extern int attente;
 
 void timer_init(int max_us) {
 	RCC->APB1ENR1 |= RCC_APB1ENR1_TIM2EN;

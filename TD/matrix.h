@@ -3,12 +3,21 @@
 
 #include <stddef.h>
 #include <stdint.h>
+#include <stdio.h>
+#include <stdlib.h>
+
+#include "uart.h"
+#include "./CMSIS/stm32l475xx.h"
+
+#define TMS 20000
 
 typedef struct {
 	uint8_t r;
 	uint8_t g;
 	uint8_t b;
 } rgb_color;
+
+extern volatile int attente;
 
 void matrix_init();
 void RST(int x);

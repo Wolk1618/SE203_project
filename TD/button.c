@@ -1,7 +1,5 @@
 #include "button.h"
 
-#include "./CMSIS/stm32l475xx.h"
-
 int on_button = 0;
 
 void button_init(void) {

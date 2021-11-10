@@ -12,7 +12,6 @@
 
 int fibo(int n);
 
-int compteur_trame = 0;
 uint32_t sum = 0;
 extern uint8_t _binary_image_raw_start;
 uint8_t * image = &_binary_image_raw_start;

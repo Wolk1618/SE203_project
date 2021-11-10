@@ -1,16 +1,6 @@
-#include <stddef.h>
-#include <stdint.h>
-
-#include <stdio.h>
-#include <stdlib.h>
-
 #include "matrix.h"
-#include "uart.h"
-#include "./CMSIS/stm32l475xx.h"
 
-#define TMS 20000
-
-int attente = 1;
+volatile int attente = 1;
 
 void matrix_init() {
 	RCC->AHB2ENR |= RCC_AHB2ENR_GPIOAEN;
@@ -162,9 +152,9 @@ void mat_set_row(int row, const rgb_color *val) {
 		asm volatile("nop");
 	}
 	deactivate_rows();
-	for(int i=0; i<(TMS/2); i++) {
+	/*for(int i=0; i<(TMS/2); i++) {
 		asm volatile("nop");
-	}
+	}*/
 }
 
 void init_bank0() {
@@ -225,10 +215,10 @@ void print_image(uint8_t * image_print) {
 			color[i].b = *image;	
 			image ++;
 		}
-		if(attente == 0) {
-			mat_set_row(i, color);
-			attente = 1;
+		while(attente == 1) {
 		}
+		mat_set_row(i, color);
+		attente = 1;
 	}
 }
 
